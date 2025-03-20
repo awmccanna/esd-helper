@@ -1,0 +1,19 @@
+{
+    "appId": "com.awmccanna.esd-helper",
+    "productName": "ESDHelper",
+    "icon": "./desktop-icon.png",
+    "files": [
+        "dist-electron",
+        "dist-react"
+    ],
+    "mac": {
+        "target": "dmg"
+    },
+    "linux": {
+        "target": "AppImage",
+        "category": "Utility"
+    },
+    "win": {
+        "target": ["portable", "msi"]
+    }
+}
