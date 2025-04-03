@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import styles from './AddApplication.module.css';
 
 interface AddApplicationForm {
     company: string;
@@ -54,27 +55,63 @@ const AddApplication: React.FC = () => {
     }
 
     return (
-        <div>
-            <h2>Add New Application</h2>
-            {message && <p>{message}</p>}
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Company:</label>
-                    <input type="text" value={company} onChange={(e) => setCompany(e.target.value)} required />
+
+        <div className={styles.container}>
+            <h2 className={styles.title}>Add New Application</h2>
+
+            {message && <p className={styles.message}>{message}</p>}
+
+            <form onSubmit={handleSubmit} className={styles.form}>
+                <div className={styles.formGroup}>
+                    <label className={styles.label}>Company:</label>
+                    <input
+                        type="text"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                        required
+                        className={styles.input}
+                    />
                 </div>
-                <div>
-                    <label>Position:</label>
-                    <input type="position" value={position} onChange={(e) => setPosition(e.target.value)} required />
+
+                <div className={styles.formGroup}>
+                    <label className={styles.label}>Position:</label>
+                    <input
+                        type="text"
+                        value={position}
+                        onChange={(e) => setPosition(e.target.value)}
+                        required
+                        className={styles.input}
+                    />
                 </div>
-                <div>
-                    <label>URL:</label>
-                    <input type="text" value={url} onChange={(e) => setUrl(e.target.value)} required />
+
+                <div className={styles.formGroup}>
+                    <label className={styles.label}>URL:</label>
+                    <input
+                        type="text"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                        required
+                        className={styles.input}
+                    />
                 </div>
-                <div>
-                    <label>Applied Date:</label>
-                    <input type="date" value={appliedDate} onChange={(e) => setAppliedDate(e.target.value)} required />
+
+                <div className={styles.formGroup}>
+                    <label className={styles.label}>Applied Date:</label>
+                    <input
+                        type="date"
+                        value={appliedDate}
+                        onChange={(e) => setAppliedDate(e.target.value)}
+                        required
+                        className={styles.input}
+                    />
                 </div>
-                <button type="submit">Add Application</button>
+
+                <button
+                    type="submit"
+                    className={styles.button}
+                >
+                    Add Application
+                </button>
             </form>
         </div>
     );

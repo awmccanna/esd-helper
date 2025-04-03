@@ -3,7 +3,9 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+  ],
   base: './',
   build: {
     outDir: 'dist-react',
@@ -12,4 +14,9 @@ export default defineConfig({
     port: 5123,
     strictPort: true,
   },
+  css: {
+    modules: {
+      localsConvention: 'camelCase' // optional but recommended
+    }
+  }
 })
