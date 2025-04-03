@@ -25,7 +25,6 @@ const App: React.FC = () => {
                 </button>
             <div className={styles.header}>
                 <h1>Job Application Tracker</h1>
-                <br />
             </div>
             
             <button 
