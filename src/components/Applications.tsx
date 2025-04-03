@@ -12,26 +12,44 @@ const copyToClipboard = (text: string) => {
 }
 
 const Applications: React.FC = () => {
-    const [applications, /*setApplications*/] = useState<JobApplication[]>([]);
-    const [loading, /*setLoading*/] = useState<boolean>(true);
+    const [applications, setApplications] = useState<JobApplication[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    const fetchApplications = async () => {
+        setLoading(true);
+        try {
+            console.log('Fetching applications');
+            const data = await window.electron.getApplications();
+
+            if (data.error) {
+                console.error('Error fetching applications:', data.error);
+            } else {
+                setApplications(data);
+            }
+        } catch (error) {
+            console.error('Error fetching applications:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        // TODO change how data is handled here
-        // axios.get('http://localhost:8080/api/applications')
-        //     .then(response => {
-        //         setApplications(response.data);
-        //         setLoading(false);
-        //     })
-        //     .catch(error => {
-        //         console.error(error);
-        //         setLoading(false);
-        //     });
-
-    }, [])
+        fetchApplications();
+    }, []);
 
     return (
         <div>
             <h2>Job Applications</h2>
+            <button onClick={fetchApplications} style={{
+                    padding: '5px 10px',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    borderRadius: '5px',
+                    border: '1px solid #ccc',
+                    backgroundColor: '#f0f0f0'
+                }}>
+                    🔄 Refresh
+                </button>
             {loading ? (
                 <p>Loading...</p>
             ) : (

@@ -1,57 +1,38 @@
 import React, { useState } from 'react';
 import styles from './AddApplication.module.css';
 
-interface AddApplicationForm {
-    company: string;
-    url: string;
-    position: string;
-    appliedDate: string;
-}
-
 const AddApplication: React.FC = () => {
     const [company, setCompany] = useState<string>('');
     const [url, setUrl] = useState<string>('');
     const [position, setPosition] = useState<string>('');
     const [appliedDate, setAppliedDate] = useState<string>('');
-    const [message, /*setMessage*/] = useState<string>('');
+    const [message, setMessage] = useState<string>('');
 
-    const handleSubmit = (event: React.FormEvent) => {
-        console.log('submitting form');
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        const newApplication: AddApplicationForm = {
-            company,
-            url,
-            position,
-            appliedDate
-        };
 
-        console.log(newApplication);
-
-        // TODO change how data is handled here
-        // axios.post('http://localhost:8080/api/applications', newApplication, {
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     }
-        // })
-        //     .then(response => {
-        //         setMessage('Application added successfully!');
-        //         setCompany('');
-        //         setUrl('');
-        //         setAppliedDate('');
-        //         setPosition('');
-        //     })
-        //     .catch(error => {
-        //         if (error.response) {
-        //             console.error("Response Error:", error.response.data);
-        //             setMessage(`Error: ${error.response.data.message || "Something went wrong."}`);
-        //         } else if (error.request) {
-        //             console.error("Request Error:", error.request);
-        //             setMessage("No response received from the server.");
-        //         } else {
-        //             console.error("Axios Error:", error.message);
-        //             setMessage("Request setup failed.");
-        //         }
-        //     });
+        if (!company || !url || !position || !appliedDate) {
+            setMessage('Please fill in all fields.');
+            return;
+        }
+    
+        try {
+            console.log("Submitting application");
+            const response = await window.electron.createApplication(company, url, position, appliedDate);
+            
+            if (response?.error) {
+                setMessage(`Error: ${response.error}`);
+            } else {
+                setMessage('Application added successfully!');
+                setCompany('');
+                setUrl('');
+                setPosition('');
+                setAppliedDate('');
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
+            setMessage('An error occurred while submitting the application.');
+        }
     }
 
     return (

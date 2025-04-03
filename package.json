@@ -14,14 +14,17 @@
     "transpile:electron": "tsc --project src/electron/tsconfig.json",
     "dist:mac": "npm run transpile:electron && npm run build && electron-builder --mac --arm64",
     "dist:win": "npm run transpile:electron && npm run build && electron-builder --win --x64",
-    "dist:linux": "npm run transpile:electron && npm run build && electron-builder --linux --x64"
+    "dist:linux": "npm run transpile:electron && npm run build && electron-builder --linux --x64",
+    "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "better-sqlite3": "^11.9.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@types/better-sqlite3": "^7.6.12",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",

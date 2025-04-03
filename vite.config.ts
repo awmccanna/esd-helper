@@ -9,6 +9,9 @@ export default defineConfig({
   base: './',
   build: {
     outDir: 'dist-react',
+    rollupOptions: {
+      external: ['better-sqlite3']
+    }
   },
   server: {
     port: 5123,
