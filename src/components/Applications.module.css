@@ -1,0 +1,42 @@
+/* Applications.module.css */
+
+.container {
+    padding: 16px;
+}
+
+.refreshButton {
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.refreshButton:hover {
+    background-color: #e0e0e0;
+}
+
+.weekHeader {
+    cursor: pointer;
+    user-select: none;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.appList {
+    list-style-type: none;
+    padding: 0;
+}
+
+.appItem {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.copyable {
+    cursor: pointer;
+    font-weight: bold;
+}

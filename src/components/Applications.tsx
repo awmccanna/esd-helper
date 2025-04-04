@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import styles from './Applications.module.css';
 
 interface JobApplication {
     company: string;
@@ -14,11 +15,12 @@ const copyToClipboard = (text: string) => {
 const Applications: React.FC = () => {
     const [applications, setApplications] = useState<JobApplication[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [groupedApplications, setGroupedApplications] = useState<Map<string, JobApplication[]>>(new Map());
+    const [expandedWeeks, setExpandedWeeks] = useState<Set<string>>(new Set());
 
-    const fetchApplications = async () => {
+    const getApplications = async () => {
         setLoading(true);
         try {
-            console.log('Fetching applications');
             const data = await window.electron.getApplications();
 
             if (data.error) {
@@ -33,67 +35,113 @@ const Applications: React.FC = () => {
         }
     };
 
+    const groupApplications = useCallback(() => {
+        const grouped = new Map<string, JobApplication[]>();
+
+        applications.forEach((application) => {
+            const d = new Date(application.appliedDate);
+            d.setHours(0, 0, 0, 0);
+            // Subtract the day of the week to make sure we reference Sunday.
+            d.setDate(d.getDate() - d.getDay());
+            const startOfWeek = d.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }).replace(/\//g, '/');
+            
+            if (grouped.has(startOfWeek)) {
+                grouped.get(startOfWeek)!.push(application);
+            } else {
+                grouped.set(startOfWeek, [application]);
+            }
+        })
+
+        setGroupedApplications(grouped);
+    }, [applications])
+
+    const toggleWeek = (week: string) => {
+        setExpandedWeeks(prev => {
+            const newSet = new Set(prev);
+            newSet.has(week) ? newSet.delete(week) : newSet.add(week);
+            return newSet;
+        });
+    }
+
     useEffect(() => {
-        fetchApplications();
+        getApplications();
     }, []);
 
+    useEffect(() => {
+        groupApplications();
+    }, [applications]);
+
     return (
-        <div>
+        <div className={styles.container}>
             <h2>Job Applications</h2>
-            <button onClick={fetchApplications} style={{
-                    padding: '5px 10px',
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                    borderRadius: '5px',
-                    border: '1px solid #ccc',
-                    backgroundColor: '#f0f0f0'
-                }}>
-                    🔄 Refresh
-                </button>
+            <button onClick={getApplications} className={styles.refreshButton}>
+                Refresh
+            </button>
             {loading ? (
                 <p>Loading...</p>
             ) : (
-                <ul>
-                    {applications.map((app, index) => (
-                        <li key={index}>
-                            <p>
-                                <strong onClick={() => copyToClipboard(app.company)}
-                                    style={{ cursor: 'pointer' }}
-                                    title="Copy to clipboard">
-                                    Company:{' '}
-                                </strong>
-                                {app.company}
-                            </p>
-                            <p>
-                                <strong onClick={() => copyToClipboard(app.position)}
-                                    style={{ cursor: 'pointer' }}
-                                    title="Copy to clipboard">
-                                    Position:{' '}
-                                </strong>
-                                {app.position}
-                            </p>
-                            <p>
-                                <strong onClick={() => copyToClipboard(app.url)}
-                                    style={{ cursor: 'pointer' }}
-                                    title="Copy to clipboard">
-                                    URL:{' '}
-                                </strong>
-                                <a href={app.url} target="_blank" rel="noopener noreferrer">
-                                    {app.url}
-                                </a>
-                            </p>
-                            <p>
-                                <strong onClick={() => copyToClipboard(new Date(app.appliedDate).toLocaleDateString())}
-                                    style={{ cursor: 'pointer' }}
-                                    title="Copy to clipboard">
-                                    Applied Date:{' '}
-                                </strong>
-                                {new Date(app.appliedDate).toLocaleDateString()}
-                            </p>
-                            <hr />
-                        </li>
+                <div>
+                    {[...groupedApplications.entries()].map(([week, applications]) => (
+                        <div key={week}>
+                            <h3
+                                onClick={() => toggleWeek(week)}
+                                className={styles.weekHeader}
+                            >
+                                Week of {week} {expandedWeeks.has(week) ? '▼' : '▶'}
+                            </h3>
+                            {
+                                expandedWeeks.has(week) && (
+                                    <ul className={styles.appList}>
+                                        {applications.map((app, index) => (
+                                            <li key={index} className={styles.appItem}>
+                                                <p>
+                                                    <strong
+                                                        onClick={() => copyToClipboard(app.company)}
+                                                        className={styles.copyable}
+                                                        title="Copy to clipboard">
+                                                        Company:{' '}
+                                                    </strong>
+                                                    {app.company}
+                                                </p>
+                                                <p>
+                                                    <strong onClick={() => copyToClipboard(app.position)}
+                                                        className={styles.copyable}
+                                                        title="Copy to clipboard">
+                                                        Position:{' '}
+                                                    </strong>
+                                                    {app.position}
+                                                </p>
+                                                <p>
+                                                    <strong onClick={() => copyToClipboard(app.url)}
+                                                        className={styles.copyable}
+                                                        title="Copy to clipboard">
+                                                        URL:{' '}
+                                                    </strong>
+                                                    <a href={app.url} target="_blank" rel="noopener noreferrer">
+                                                        {app.url}
+                                                    </a>
+                                                </p>
+                                                <p>
+                                                    <strong onClick={() => copyToClipboard(new Date(app.appliedDate).toLocaleDateString())}
+                                                        className={styles.copyable}
+                                                        title="Copy to clipboard">
+                                                        Applied Date:{' '}
+                                                    </strong>
+                                                    {new Date(app.appliedDate).toLocaleDateString()}
+                                                </p>
+                                                <hr />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )
+                            }
+                        </div>
                     ))}
-                </ul>
+                </div>
             )}
         </div>
     );
