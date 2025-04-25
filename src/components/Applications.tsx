@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styles from './Applications.module.css';
+import { defaultApp } from 'process';
 
 interface JobApplication {
     company: string;
@@ -35,6 +36,39 @@ const Applications: React.FC = () => {
         }
     };
 
+    const exportApplications = async () => {
+        try {
+            const csvRows = [
+                ['Company', 'Position', 'URL', 'Applied Date']
+            ];
+
+            applications.forEach(app => {
+                csvRows.push([
+                    `"${app.company}"`,
+                    `"${app.position}"`,
+                    `"${app.url}"`,
+                    `"${new Date(app.appliedDate).toLocaleDateString()}"`
+                ]);
+            });
+
+            const csvContent = csvRows.map(row => row.join(',')).join('\n');
+
+            const result = await window.electron.saveFile({
+                content: csvContent,
+                defaultPath: 'applications.csv'
+            });
+
+            if (!result.canceled) {
+                console.log('File saved successfully');
+            } else {
+                console.log('File save canceled');
+            }
+
+        } catch (error) {
+            console.log('Error exporting applications', error)
+        }
+    }
+
     const groupApplications = useCallback(() => {
         const grouped = new Map<string, JobApplication[]>();
 
@@ -48,7 +82,7 @@ const Applications: React.FC = () => {
                 month: '2-digit',
                 day: '2-digit'
             }).replace(/\//g, '/');
-            
+
             if (grouped.has(startOfWeek)) {
                 grouped.get(startOfWeek)!.push(application);
             } else {
@@ -78,9 +112,14 @@ const Applications: React.FC = () => {
     return (
         <div className={styles.container}>
             <h2>Job Applications</h2>
-            <button onClick={getApplications} className={styles.refreshButton}>
-                Refresh
-            </button>
+            <div className={styles.buttonGroup}>
+                <button onClick={getApplications} className={styles.button}>
+                    Refresh
+                </button>
+                <button onClick={exportApplications} className={styles.button}>
+                    Export
+                </button>
+            </div>
             {loading ? (
                 <p>Loading...</p>
             ) : (

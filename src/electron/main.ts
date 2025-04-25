@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import path from 'path';
+import fs from 'fs/promises';
 import { isDev } from './util.js';
 import Database from 'better-sqlite3';
 import { getPreloadPath } from './pathResolver.js';
@@ -73,3 +74,17 @@ ipcMain.handle('deleteApplication', (_event, id) => {
         return { error: (error as Error).message };
     }
 });
+
+ipcMain.handle('saveFile', async (_event, {content, defaultPath})=> {
+    const { filePath, canceled } = await dialog.showSaveDialog({
+        defaultPath,
+        filters: [{ name: 'CSV Files', extensions: ['csv']}]
+    });
+
+    if (!canceled && filePath) {
+        await fs.writeFile(filePath, content);
+        return { canceled: false };
+    };
+
+    return { canceled: true };
+}) ;

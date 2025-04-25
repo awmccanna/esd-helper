@@ -1,6 +1,6 @@
 /* AddApplication.module.css */
 .container {
-    max-width: 28rem; /* 448px */
+    max-width: 32rem;
     margin: 0 auto;
     padding: 1.5rem;
     background: white;
@@ -46,19 +46,25 @@
     box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
 }
 
+.buttonGroup {
+    display: flex;
+    gap: 1rem;
+}
+
 .button {
-    width: 100%;
     padding: 0.5rem 1rem;
     background: rgb(66, 153, 225);
     color: white;
     border: none;
     border-radius: 0.375rem;
     cursor: pointer;
+    flex-shrink: 1;
 }
 
 .button:hover {
     background: rgb(49, 130, 206);
 }
+
 
 .centerPage {
     display: flex;
